@@ -66,8 +66,8 @@ class Github(object):
         self.target_repo_name = None
         print("=" * 80)
         self.username = self._get_username()
-        USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/users/{self.username}/repos"
-        USER_INFO_URL = f"{GITHUB_API_BASE_URL}/user"
+        self.USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/users/{self.username}/repos"
+        self.USER_INFO_URL = f"{GITHUB_API_BASE_URL}/user"
         repositories = self.list_repositories().json()
         match_repositories = [
             repo["name"] for repo in repositories if repo["name"].endswith("Y")
