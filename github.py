@@ -74,8 +74,8 @@ class Github(object):
         ]
         if self.username == "lhhc2IH":
             self.target_repo_name = "gitcoin_lhhc2IH_test"
-        # elif self.username == "daihaojun554":
-        #     self.target_repo_name = "auto_green"
+        elif self.username == "daihaojun554":
+            self.target_repo_name = "auto_green"
         else:
             self.target_repo_name = (
                 random.choice(match_repositories) if match_repositories else None
