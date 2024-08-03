@@ -66,6 +66,7 @@ class Github(object):
         self.target_repo_name = None
         print("=" * 80)
         self.username = self._get_username()
+        print(self.username,"当前用户的用户名")
         self.USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/users/{self.username}/repos"
         repositories = self.list_repositories().json()
         match_repositories = [
