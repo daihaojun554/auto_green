@@ -46,13 +46,8 @@ def get_proxy_ip(proxy):
         + ":"
         + str(proxys[1])
     )
-
-
+GITHUB_API_BASE_URL = "https://api.github.com"
 class Github(object):
-    GITHUB_API_BASE_URL = "https://api.github.com"
-    USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/user/repos"
-    USER_INFO_URL = f"{GITHUB_API_BASE_URL}/user"
-
     def __init__(self, token, proxy=None):
         self.token = token
         self.proxies = {}
@@ -71,6 +66,8 @@ class Github(object):
         self.target_repo_name = None
         print("=" * 80)
         self.username = self._get_username()
+        USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/users/{self.username}/repos"
+        USER_INFO_URL = f"{GITHUB_API_BASE_URL}/user"
         repositories = self.list_repositories().json()
         match_repositories = [
             repo["name"] for repo in repositories if repo["name"].endswith("Y")
