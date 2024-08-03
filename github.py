@@ -55,6 +55,7 @@ class Github(object):
 
     def __init__(self, token, proxy=None):
         self.token = token
+        self.proxies = {}
         if proxy:
             self.proxy = proxy
             self.proxies = (
@@ -425,8 +426,7 @@ class Github(object):
 
 
 def upload_random_file_to_repo(token, commit_message):
-    proxy = None
-    g = Github(token=token, proxy=proxy)
+    g = Github(token=token, proxy=None)
     file_ = g.get_random_file_("query")
     g.upload_file_to_repo_forsha(file_, commit_message)
 
