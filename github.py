@@ -65,9 +65,8 @@ class Github(object):
         }
         self.target_repo_name = None
         print("=" * 80)
-        self.USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/users/{self.username}/repos"
-        self.USER_INFO_URL = f"{GITHUB_API_BASE_URL}/user"
         self.username = self._get_username()
+        self.USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/users/{self.username}/repos"
         repositories = self.list_repositories().json()
         match_repositories = [
             repo["name"] for repo in repositories if repo["name"].endswith("Y")
@@ -126,7 +125,7 @@ class Github(object):
 
     def _get_username(self):
         """获取当前用户的用户名"""
-        response = self._make_request("GET", self.USER_INFO_URL)
+        response = self._make_request("GET", "https://api.github.com/user")
         return response.json().get("login") if response else None
 
     def _make_request(self, method, url, data=None, **kwargs):
@@ -218,7 +217,7 @@ class Github(object):
 
     def search_repositories(self, q):
         url = (
-            self.GITHUB_API_BASE_URL
+            GITHUB_API_BASE_URL
             + f"/search/repositories?q={q}&per_page=10&page=1&order=desc&sort=stars"
         )
         response = self._make_request("GET", url)
@@ -227,7 +226,7 @@ class Github(object):
     def _get_file_sha(self, file_path, branch='main'):
         response = self._make_request(
             "GET",
-            f"{self.GITHUB_API_BASE_URL}/repos/{self.username}/{self.target_repo_name}/contents/{file_path}?ref={branch}",
+            f"{GITHUB_API_BASE_URL}/repos/{self.username}/{self.target_repo_name}/contents/{file_path}?ref={branch}",
         )
         return response.json().get("sha") if response else None
 
