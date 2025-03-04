@@ -10,7 +10,6 @@ import json
 import pandas as pd
 
 
-
 def detect_encoding(file_path):
     with open(file_path, "rb") as file:
         raw_data = file.read()
@@ -37,16 +36,20 @@ def get_proxy_ip(proxy):
         return proxy
     proxys = proxy.split(":")
     return (
-        "http://"
-        + str(proxys[2])
-        + ":"
-        + str(proxys[3])
-        + "@"
-        + str(proxys[0])
-        + ":"
-        + str(proxys[1])
+            "http://"
+            + str(proxys[2])
+            + ":"
+            + str(proxys[3])
+            + "@"
+            + str(proxys[0])
+            + ":"
+            + str(proxys[1])
     )
+
+
 GITHUB_API_BASE_URL = "https://api.github.com"
+
+
 class Github(object):
     def __init__(self, token, proxy=None):
         self.token = token
@@ -66,7 +69,7 @@ class Github(object):
         self.target_repo_name = None
         print("=" * 80)
         self.username = self._get_username()
-        print(self.username,"当前用户的用户名")
+        print(self.username, "当前用户的用户名")
         self.USER_REPOS_URL = f"{GITHUB_API_BASE_URL}/users/{self.username}/repos"
         repositories = self.list_repositories().json()
         match_repositories = [
@@ -80,49 +83,51 @@ class Github(object):
             self.target_repo_name = (
                 random.choice(match_repositories) if match_repositories else None
             )
+
         if not self.target_repo_name and (
-            self.username != "lhhc2IH"
+                self.username != "lhhc2IH"
         ):
             print("No repository ,need to create repo")
             self.create_repo()
         print(f"当前需要操作的仓库: {self.target_repo_name or 'None'}")
+        # with open("./repo.csv", 'a', encoding='utf-8') as file:
+        #     file.write(
+        #         f'{self.username},https://github.com/{self.username}/{self.target_repo_name}\n')
+        # 需要将 ci.yml文件 和 ci-puls.yml上传 和 github.py本身文件上传
+        # need_to_upload_files = [
+        #     {
+        #         "path": ".github/workflows/ci-plus.yml",
+        #         "content_path": ".github/workflows/ci-plus.yml",
+        #         "message": "Update CI workflow",
+        #     },
+        #     # {
+        #     #     "path": ".github/workflows/ci.yml",
+        #     #     "content_path": ".github/workflows/ci.yml",
+        #     #     "message": "Update CI workflow",
+        #     # },
+        #     {
+        #         "path": "github.py",
+        #         "content_path": "github.py",
+        #         "message": "update github.py",
+        #     },
+        #     # {
+        #     #     "path": "script.py",
+        #     #     "content_path": "script.py",
+        #     #     "message": "update script.py",
+        #     # },
+        #     {
+        #         "path": "requirements.txt",
+        #         "content_path": "requirements.txt",
+        #         "message": "update requirement.txt",
+        #     },
+        # ]
 
-        # 需要将 ci.yml文件上传 和 github.py本身文件上传
-
-        need_to_upload_files = [
-            {
-                "path": ".github/workflows/ci-plus.yml",
-                "content_path": ".github/workflows/ci-plus.yml",
-                "message": "Update CI workflow",
-            },
-            # {
-            #     "path": ".github/workflows/ci.yml",
-            #     "content_path": ".github/workflows/ci.yml",
-            #     "message": "Update CI workflow",
-            # },
-            {
-                "path": "github.py",
-                "content_path": "github.py",
-                "message": "update github.py",
-            },
-            # {
-            #     "path": "script.py",
-            #     "content_path": "script.py",
-            #     "message": "update script.py",
-            # },
-            {
-                "path": "requirements.txt",
-                "content_path": "requirements.txt",
-                "message": "update requirement.txt",
-            },
-        ]
-
-        for file_info in need_to_upload_files:
-            file_path = file_info["path"]
-            content_path = file_info["content_path"]
-            commit_message = file_info["message"]
-            self.upload_file_to_repo(file_path,content_path,commit_message)
-            time.sleep(3)
+        # for file_info in need_to_upload_files:
+        #     file_path = file_info["path"]
+        #     content_path = file_info["content_path"]
+        #     commit_message = file_info["message"]
+        #     self.upload_file_to_repo(file_path, content_path, commit_message)
+        #     time.sleep(3)
 
     def _get_username(self):
         """获取当前用户的用户名"""
@@ -148,7 +153,7 @@ class Github(object):
             print(f"Http请求错误 {http_err}")
             if response.status_code == 422:
                 print(f"{response.status_code}--{response.text}")
-                
+
             elif response.status_code in [404, 401]:
                 print(
                     f"response.status_code :{response.status_code}:{response.text}"
@@ -185,14 +190,14 @@ class Github(object):
         return self._make_request("GET", self.USER_REPOS_URL)
 
     def upload_file_to_repo(
-        self, file_path, content_path,commit_message, branch="main"
+            self, file_path, content_path, commit_message, branch="main"
     ):
         encoding = detect_encoding(content_path)
         with open(content_path, "r", encoding=encoding) as file:
             content = file.read()
-           # Encode content in base64
+        # Encode content in base64
         encoded_content = base64.b64encode(content.encode()).decode()
-          # Get the current SHA of the file if it exists
+        # Get the current SHA of the file if it exists
         sha = self._get_file_sha(file_path)
 
         # Prepare the payload
@@ -203,11 +208,11 @@ class Github(object):
         if sha:
             data['sha'] = sha
         # 对内容进行base64编码
-                # Make the API call
+        # Make the API call
         self._make_request('put',
-            f'https://api.github.com/repos/{self.username}/{self.target_repo_name}/contents/{file_path}',
-            data=json.dumps(data)
-        )
+                           f'https://api.github.com/repos/{self.username}/{self.target_repo_name}/contents/{file_path}',
+                           data=json.dumps(data)
+                           )
         # if response.status_code == 201:
         #     print(f"File '{file_path}' created successfully.")
         # elif response.status_code == 200:
@@ -218,8 +223,8 @@ class Github(object):
 
     def search_repositories(self, q):
         url = (
-            GITHUB_API_BASE_URL
-            + f"/search/repositories?q={q}&per_page=10&page=1&order=desc&sort=stars"
+                GITHUB_API_BASE_URL
+                + f"/search/repositories?q={q}&per_page=10&page=1&order=desc&sort=stars"
         )
         response = self._make_request("GET", url)
         return response.json()["items"] if response else None
@@ -246,7 +251,7 @@ class Github(object):
                 random.choice(match_repositories) if match_repositories else None
             )
         if not self.target_repo_name and (
-            self.username != "lhhc2IH" or self.username != "daihaojun554"
+                self.username != "lhhc2IH" or self.username != "daihaojun554"
         ):
             print("No repository ,need to create repo")
             self.create_repo()
@@ -397,9 +402,7 @@ class Github(object):
                     continue
                 else:
                     file_ = _
-                    break
-
-        return file_
+                    return file_
 
     def upload_file_to_repo_forsha(self, fiel, commit_message):
         url = f"https://api.github.com/repos/{self.username}/{self.target_repo_name}/contents/{fiel.get('path')}"
@@ -424,15 +427,57 @@ class Github(object):
 
 def upload_random_file_to_repo(token, commit_message):
     g = Github(token=token, proxy=None)
-    file_ = g.get_random_file_("query")
+    keyword = str(random.choice(open('keywords.txt', encoding='utf-8').read().splitlines()))
+    file_ = g.get_random_file_(keyword)
     g.upload_file_to_repo_forsha(file_, commit_message)
+
+
+import random
+
+# 定义一个包含多个模板消息的列表
+commit_message_templates = [
+    "修复了 {issue} 问题",
+    "添加了 {feature} 功能",
+    "优化了 {module} 模块的性能",
+    "更新了 {file} 文件",
+    "改进了 {function} 函数的实现",
+    "增加了 {test} 单元测试",
+    "调整了 {config} 配置文件",
+    "解决了 {bug} Bug",
+    "合并了 {branch} 分支",
+    "重构了 {code} 代码"
+]
+
+
+# 生成随机的 commit message
+def generate_random_commit_message():
+    template = random.choice(commit_message_templates)
+    # 假设我们有一些变量可以填充到模板中
+    placeholders = {
+        "issue": "登录失败",
+        "feature": "用户认证",
+        "module": "网络请求",
+        "file": "config.py",
+        "function": "validate_user",
+        "test": "test_login",
+        "config": "settings.json",
+        "bug": "空指针异常",
+        "branch": "feature-branch",
+        "code": "main.py"
+    }
+    commit_message = template.format(**placeholders)
+    return commit_message
+
+
+# 示例调用
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python script.py <token>")
+        print("Usage: python github.py <token>")
         sys.exit(1)
     my_test_token = sys.argv[1]
+    commit_message = [generate_random_commit_message()]
     upload_random_file_to_repo(
-        my_test_token, commit_message="i want to commit this file"
+        my_test_token, commit_message=commit_message[0]
     )
